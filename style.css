@@ -1,0 +1,96 @@
+* {
+    outline: none;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    font-family: "Roboto", sans-serif;
+    overflow: hidden;
+}
+
+#draw {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #f5f5f5;
+    padding: 0;
+    margin: 0;
+}
+
+.toolbar {
+    background-color: white;
+    z-index: 10;
+    box-shadow: 0 0 12px #dcdbdb;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    position: fixed;
+    border-radius: 0 10px 10px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.tool-button {
+    font-size: 2.6em;
+    cursor: pointer;
+    padding: .4em .6em;
+    background-color: transparent;
+    border: 0;
+    transition: .3s all ease;
+}
+
+.tool-button:first-child {
+    border-radius: 0 10px 0 0;
+}
+
+.tool-button:last-child {
+    border-radius: 0 0 10px 0;
+}
+
+.tool-button:hover {
+    background-color: #5b90cd;
+    color: #e8e8e8;
+}
+
+#modal {
+    position: absolute;
+    z-index: 11;
+    width: 100vw;
+    top: 0;
+    height: 100vh;
+    display: flex;
+}
+
+.modal-background {
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 100%;
+    height: 100%;
+}
+
+.popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 10px;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+}
+
+.popup input, .popup select{
+    font-size: 1em;
+    margin: .4em 0;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    padding: .2em .4em;
+    border-color: #333333;
+}
+
+.hidden {
+    display: none !important;
+}
