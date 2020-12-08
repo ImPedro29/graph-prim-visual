@@ -12,8 +12,8 @@ let nodes = [
         name: "Pussy",
     },
     {
-        x: 450,
-        y: 900,
+        x: 650,
+        y: 300,
         id: 3,
         name: "Banana",
     },
@@ -50,18 +50,29 @@ let edges = [
 ];
 
 class Graph {
-    constructor(nodes, edges, ctx) {
+    constructor(nodes, edges) {
         this.nodes = nodes;
         this.edges = edges;
+        do {
+            this.nextId = 0;
+        } while (nodes.find(item => item.id === this.nextId))
+        {
+            this.nextId++;
+        }
+    }
+
+    setContext(ctx) {
         this.ctx = ctx;
     }
+
     render() {
         for (let edge of this.edges)
             this.renderEdge(edge);
         for (let node of this.nodes)
             this.renderNode(node);
     }
-    renderEdge({from, to}) {
+
+    renderEdge({from, to, weight}) {
         let fromNode = this.nodes.find(node => node.id === from);
         let toNode = this.nodes.find(node => node.id === to);
 
@@ -69,79 +80,79 @@ class Graph {
         let {ctx} = this;
         ctx.moveTo(fromNode.x, fromNode.y);
         ctx.lineTo(toNode.x, toNode.y);
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = '#5b90cd';
+        ctx.lineWidth = weight;
+        ctx.strokeStyle = '#333';
         ctx.stroke();
         this.ctx.closePath();
     }
+
     renderNode({x, y}) {
         this.ctx.beginPath();
         let {ctx} = this;
-        ctx.arc(x, y, 40, 0, 2 * Math.PI);
-        ctx.strokeStyle = 'white';
-        ctx.stroke();
-        ctx.fill()
-        this.ctx.closePath();
-
+        let img = document.createElement('img')
+        img.src = "images/pole.png"
+        img.onload = () => {
+            ctx.drawImage(img, x - 50, y - 10, 100, 100)
+            this.ctx.closePath();
+        }
     }
-    getNodes(){
+
+    getNodes() {
         return this.nodes;
     }
-    getEdges(){
+
+    getEdges() {
         return this.edges;
     }
-    registerClickEvents(){
+
+    addNode(name) {
+        let x = Math.floor(Math.random() * (window.innerWidth - 100))
+        let y = Math.floor(Math.random() * (window.innerHeight - 100))
+        this.nodes.push({
+            x,
+            y,
+            name,
+            id: this.nextId++
+        })
+    }
+
+    addEdge(from, to, weight) {
+        from = parseInt(from)
+        to = parseInt(to)
+        weight = parseInt(weight)
+        this.edges.push({
+            from,
+            to,
+            weight
+        })
+    }
+
+    registerClickEvents() {
 
     }
+
     getNeighbors(id) { // Pegar adjacentes (visinhos)
         return this.edges.filter(edge => edge.from === id);
     }
 }
 
+const graph = new Graph(nodes, edges)
+
 window.onload = () => {
     canvasSetRelativeSize();
     const canvas = document.getElementById('draw');
-    const graph = new Graph(nodes, edges, canvas.getContext("2d"))
-
-    // console.log(graph.getNeighbors(1)) // pegar visinhos
-
+    graph.setContext(canvas.getContext("2d"))
     graph.render();
+
+    //load
+    loadData()
 
     //Events
     document.getElementById('modalCloser').addEventListener('click', closeModal);
-    document.getElementById('add').addEventListener('click', openAddModal);
+    document.getElementById('add').addEventListener('click', openModal);
 }
 
-// window.addEventListener('resize', canvasSetRelativeSize);
-
-function openAddModal(){
-    let content = document.createElement('div');
-    content.classList.add('popup');
-
-    let inputs = new Array(2).fill(0).map(() => [document.createElement('label'), document.createElement('input')]);
-    let [name, weight] = inputs;
-
-    let selects = new Array(3).fill(0).map(() => [document.createElement('label'), document.createElement('select')]);
-    let [type, from, to] = selects;
-
-    name[0].innerHTML = 'Digite o nome';
-    type[0].innerHTML = 'Digite o tipo';
-    from[0].innerHTML = 'Digite o partida';
-    to[0].innerHTML = 'Digite o destino';
-    weight[0].innerHTML = 'Digite o peso';
-
-    for (let input of inputs)
-        for (let doc of input)
-            content.appendChild(doc);
-
-    for (let input of selects)
-        for (let doc of input)
-            content.appendChild(doc);
-
-    openModal(content);
-}
-
-function canvasSetRelativeSize(){
+function canvasSetRelativeSize() {
     let width = window.innerWidth;
     let height = window.innerHeight;
 
@@ -149,13 +160,101 @@ function canvasSetRelativeSize(){
     canvas.setAttribute('width', width);
     canvas.setAttribute('height', height);
 }
-function closeModal(){
+
+function closeModal() {
     document.getElementById('modal').classList.add('hidden');
 }
-function openModal(content){ // Content should be a document
+
+function openModal() { // Content should be a document
     let modal = document.getElementById('modal');
     modal.classList.remove('hidden');
-    modal.appendChild(content);
-
 }
 
+function inputTypeChange(target) {
+    let node = document.querySelector(".isNode")
+    let edge = document.querySelector(".isEdge")
+    switch (target.value) {
+        case "node":
+            node.classList.remove("hidden")
+            edge.classList.add("hidden")
+            break;
+        case "edge":
+            node.classList.add("hidden")
+            edge.classList.remove("hidden")
+            loadData()
+            break;
+    }
+}
+
+function add() {
+    let type = document.getElementById('inputType').value;
+    if (type === "node") {
+        let name = document.getElementById('inputName').value;
+        graph.addNode(name);
+    } else {
+        let weight = parseFloat(document.getElementById('inputWeight').value);
+        let from = document.getElementById('fromNode').value;
+        let to = document.getElementById('toNode').value;
+        graph.addEdge(from, to, weight);
+    }
+
+    graph.render();
+    closeModal();
+}
+
+function loadData() {
+    let from = document.getElementById('fromNode');
+    let to = document.getElementById('toNode');
+
+    from.innerHTML = "";
+    to.innerHTML = "";
+    graph.getNodes().map(node => {
+        let el = document.createElement('option')
+        el.innerText = node.name;
+        el.value = node.id;
+        from.appendChild(el);
+        to.appendChild(el.cloneNode(true));
+    })
+}
+
+
+async function select(time) {
+    let toolbar = document.querySelector('.toolbar');
+    let after = document.getElementById('after');
+    let before = document.getElementById('before');
+
+    if (time === "after") {
+        toolbar.classList.add('hidden');
+        after.classList.add('selected')
+        before.classList.remove('selected')
+
+        let data = await prim()
+        let afterGraph = new Graph(graph.getNodes(), data.map(([from, to]) => ({from, to, weight: 2})))
+        afterGraph.setContext(document.getElementById('draw').getContext('2d'))
+        afterGraph.render()
+    } else if (time === "before") {
+        toolbar.classList.remove('hidden');
+        after.classList.remove('selected')
+        before.classList.add('selected')
+
+        graph.render()
+    }
+}
+
+async function prim(){
+    let response = await fetch("http://localhost:5000/prim", {
+        method: "POST",
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            tree: graph.getEdges().map(item => ({
+                node_reference: item.from,
+                node_adjacent: item.to,
+                cost: item.weight
+            }))
+        })
+    })
+
+    return (await response.json()).response;
+}

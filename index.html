@@ -7,20 +7,51 @@
     <script src="script.js"></script>
 </head>
 <body>
-    <canvas id="draw">
+<canvas id="draw">
 
-    </canvas>
-    <div class="toolbar">
-        <button title="Adicionar" class="tool-button" id="add">
-            +
-        </button>
-        <button title="Remover" class="tool-button">
-            -
+</canvas>
+<div class="toolbar">
+    <button title="Adicionar" class="tool-button" id="add">
+        +
+    </button>
+    <button title="Remover" class="tool-button">
+        -
+    </button>
+</div>
+
+<div id="modal" class="hidden">
+    <div class="modal-background" id="modalCloser"></div>
+    <div class="popup">
+        <label>Tipo</label>
+        <select onchange="inputTypeChange(this)" value="node" id="inputType">
+            <option value="node">No</option>
+            <option value="edge">Aresta</option>
+        </select>
+        <div class="isNode">
+            <label>Nome</label>
+            <input id="inputName">
+        </div>
+        <div class="isEdge hidden">
+            <label>Peso</label>
+            <input type="number" id="inputWeight">
+            <label>Partida</label>
+            <select id="fromNode">
+                <!--                    Carregar de partida-->
+            </select>
+            <label>Destino</label>
+            <select id="toNode">
+                <!--                    Carregar de destino-->
+            </select>
+        </div>
+        <button onclick="add()">
+            Criar
         </button>
     </div>
-
-    <div id="modal" class="hidden">
-        <div class="modal-background" id="modalCloser"></div>
-    </div>
+</div>
+<div class="graphState">
+    <button id="before" class="selected" onclick="select('before')">Antes</button>
+    <div></div>
+    <button id="after" onclick="select('after')">Depois</button>
+</div>
 </body>
 </html>

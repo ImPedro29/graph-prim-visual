@@ -14,7 +14,7 @@ body {
     height: 100%;
     top: 0;
     left: 0;
-    background-color: #f5f5f5;
+    background-color: #e1e1e1;
     padding: 0;
     margin: 0;
 }
@@ -23,11 +23,11 @@ body {
     background-color: white;
     z-index: 10;
     box-shadow: 0 0 12px #dcdbdb;
-    left: 0;
+    left: 10px;
     top: 50%;
     transform: translateY(-50%);
     position: fixed;
-    border-radius: 0 10px 10px 0;
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
 }
@@ -89,6 +89,59 @@ body {
     border-width: 1px;
     padding: .2em .4em;
     border-color: #333333;
+}
+
+.popup button {
+    font-size: 1em;
+    padding: .4em;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+    text-transform: uppercase;
+    align-self: flex-end;
+}
+
+.graphState{
+    position: absolute;
+    bottom: 5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1em;
+    background-color: white;
+    z-index: 10;
+    box-shadow: 0 0 12px #dcdbdb;
+    border-radius: 10px;
+    display: flex;
+}
+
+.graphState button {
+    font-size: 1.2em;
+    cursor: pointer;
+    background-color: transparent;
+    color: #4a4a4a;
+    border: 0;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 10px;
+    transition: 0.2s all ease;
+    padding: 0 .4em;
+}
+
+.graphState button.selected {
+    color: white;
+    background: #73abdc;
+}
+
+.graphState button:hover{
+    background-color: #f0f0f0;
+    color: #333333;
+}
+
+.graphState div {
+    width: 1px;
+    height: 1.6em;
+    margin: 0 1em;
+    background-color: #dddddd;
 }
 
 .hidden {
