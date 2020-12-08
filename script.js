@@ -2,31 +2,31 @@ let nodes = [
     {
         x: 100,
         y: 200,
-        id: 1,
+        id: 0,
         name: "Piru",
     },
     {
         x: 150,
         y: 400,
-        id: 2,
+        id: 1,
         name: "Pussy",
     },
     {
         x: 650,
         y: 300,
-        id: 3,
+        id: 2,
         name: "Banana",
     },
     {
         x: 450,
         y: 800,
-        id: 4,
+        id: 3,
         name: "Jaca",
     },
     {
         x: 190,
         y: 600,
-        id: 5,
+        id: 4,
         name: "Jumento",
     }
 ];
@@ -35,16 +35,21 @@ let edges = [
     {
         from: 1,
         to: 2,
-        weight: 3 // peso
+        weight: 2 // peso
     },
     {
         from: 2,
+        to: 3,
+        weight: 3 // peso
+    },
+    {
+        from: 1,
         to: 3,
         weight: 2 // peso
     },
     {
         from: 1,
-        to: 3,
+        to: 4,
         weight: 4 // peso
     }
 ];
@@ -53,10 +58,8 @@ class Graph {
     constructor(nodes, edges) {
         this.nodes = nodes;
         this.edges = edges;
-        do {
-            this.nextId = 0;
-        } while (nodes.find(item => item.id === this.nextId))
-        {
+        this.nextId = 0;
+        while (nodes.find(item => item.id === this.nextId)) {
             this.nextId++;
         }
     }
@@ -65,14 +68,15 @@ class Graph {
         this.ctx = ctx;
     }
 
-    render() {
+    render(color = "#333") {
+        this.ctx.clearRect(0, 0, document.getElementById('draw').width, document.getElementById('draw').height);
         for (let edge of this.edges)
-            this.renderEdge(edge);
+            this.renderEdge(edge, color);
         for (let node of this.nodes)
             this.renderNode(node);
     }
 
-    renderEdge({from, to, weight}) {
+    renderEdge({from, to, weight}, color) {
         let fromNode = this.nodes.find(node => node.id === from);
         let toNode = this.nodes.find(node => node.id === to);
 
@@ -81,7 +85,7 @@ class Graph {
         ctx.moveTo(fromNode.x, fromNode.y);
         ctx.lineTo(toNode.x, toNode.y);
         ctx.lineWidth = weight;
-        ctx.strokeStyle = '#333';
+        ctx.strokeStyle = color;
         ctx.stroke();
         this.ctx.closePath();
     }
@@ -231,7 +235,7 @@ async function select(time) {
         let data = await prim()
         let afterGraph = new Graph(graph.getNodes(), data.map(([from, to]) => ({from, to, weight: 2})))
         afterGraph.setContext(document.getElementById('draw').getContext('2d'))
-        afterGraph.render()
+        afterGraph.render("#ff0000")
     } else if (time === "before") {
         toolbar.classList.remove('hidden');
         after.classList.remove('selected')

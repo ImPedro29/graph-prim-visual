@@ -42,13 +42,8 @@ body {
 }
 
 .tool-button:first-child {
-    border-radius: 0 10px 0 0;
+    border-radius: 10px;
 }
-
-.tool-button:last-child {
-    border-radius: 0 0 10px 0;
-}
-
 .tool-button:hover {
     background-color: #5b90cd;
     color: #e8e8e8;
