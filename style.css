@@ -96,7 +96,7 @@ body {
     align-self: flex-end;
 }
 
-.graphState{
+.graph-state{
     position: absolute;
     bottom: 5vh;
     left: 50%;
@@ -109,7 +109,7 @@ body {
     display: flex;
 }
 
-.graphState button {
+.graph-state button {
     font-size: 1.2em;
     cursor: pointer;
     background-color: transparent;
@@ -122,17 +122,12 @@ body {
     padding: 0 .4em;
 }
 
-.graphState button.selected {
+.graph-state button.selected {
     color: white;
     background: #73abdc;
 }
 
-.graphState button:hover{
-    background-color: #f0f0f0;
-    color: #333333;
-}
-
-.graphState div {
+.graph-state div {
     width: 1px;
     height: 1.6em;
     margin: 0 1em;

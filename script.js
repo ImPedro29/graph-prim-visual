@@ -1,4 +1,4 @@
-let nodes = [
+let NODES = [
     {
         x: 100,
         y: 200,
@@ -31,26 +31,26 @@ let nodes = [
     }
 ];
 
-let edges = [
+let EDGES = [
     {
         from: 1,
         to: 2,
-        weight: 2 // peso
+        weight: 2, // peso
     },
     {
         from: 2,
         to: 3,
-        weight: 3 // peso
+        weight: 3,// peso
     },
     {
         from: 1,
         to: 3,
-        weight: 2 // peso
+        weight: 2, // peso
     },
     {
         from: 1,
         to: 4,
-        weight: 4 // peso
+        weight: 4, // peso
     }
 ];
 
@@ -76,7 +76,7 @@ class Graph {
             this.renderNode(node);
     }
 
-    renderEdge({from, to, weight}, color) {
+    renderEdge({from, to, weight, color}, colorReceived) {
         let fromNode = this.nodes.find(node => node.id === from);
         let toNode = this.nodes.find(node => node.id === to);
 
@@ -85,7 +85,7 @@ class Graph {
         ctx.moveTo(fromNode.x, fromNode.y);
         ctx.lineTo(toNode.x, toNode.y);
         ctx.lineWidth = weight;
-        ctx.strokeStyle = color;
+        ctx.strokeStyle = color || colorReceived;
         ctx.stroke();
         this.ctx.closePath();
     }
@@ -120,36 +120,75 @@ class Graph {
         })
     }
 
-    addEdge(from, to, weight) {
+    addEdge(from, to, weight, color) {
         from = parseInt(from)
         to = parseInt(to)
         weight = parseInt(weight)
+
+        if (this.edges.find(edge => edge.from === from && edge.to === to)) {
+            this.edges = this.edges.map(
+                edge => edge.from === from && edge.to === to ?
+                    {
+                        from,
+                        to,
+                        weight,
+                        color
+                    }
+                    : edge
+            );
+
+            return;
+        }
+
         this.edges.push({
             from,
             to,
-            weight
+            weight,
+            color
         })
     }
 
-    registerClickEvents() {
+    async getSteps() {
+        const edges = this.edges;
+        let steps = [];
+        for (let i = 0; i < edges.length; i++) {
+            let edgesToSend = edges.slice(0, i + 1);
+            let response = await fetch("http://localhost:5000/prim", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    tree: edgesToSend.map(item => ({
+                        node_reference: item.from,
+                        node_adjacent: item.to,
+                        cost: item.weight
+                    }))
+                })
+            })
 
-    }
+            let json = (await response.json()).response;
+            if (steps.length !== json.length) {
+                steps.push(edgesToSend);
+            }
 
-    getNeighbors(id) { // Pegar adjacentes (visinhos)
-        return this.edges.filter(edge => edge.from === id);
+        }
+        return steps
     }
 }
 
-const graph = new Graph(nodes, edges)
-
+const GRAPH = new Graph(NODES, EDGES)
 window.onload = () => {
     canvasSetRelativeSize();
     const canvas = document.getElementById('draw');
-    graph.setContext(canvas.getContext("2d"))
-    graph.render();
+    GRAPH.setContext(canvas.getContext("2d"))
+    GRAPH.render();
 
     //load
     loadData()
+
+    //Print Steps
+    printSteps();
 
     //Events
     document.getElementById('modalCloser').addEventListener('click', closeModal);
@@ -194,15 +233,15 @@ function add() {
     let type = document.getElementById('inputType').value;
     if (type === "node") {
         let name = document.getElementById('inputName').value;
-        graph.addNode(name);
+        GRAPH.addNode(name);
     } else {
         let weight = parseFloat(document.getElementById('inputWeight').value);
         let from = document.getElementById('fromNode').value;
         let to = document.getElementById('toNode').value;
-        graph.addEdge(from, to, weight);
+        GRAPH.addEdge(from, to, weight);
     }
 
-    graph.render();
+    GRAPH.render();
     closeModal();
 }
 
@@ -212,7 +251,7 @@ function loadData() {
 
     from.innerHTML = "";
     to.innerHTML = "";
-    graph.getNodes().map(node => {
+    GRAPH.getNodes().map(node => {
         let el = document.createElement('option')
         el.innerText = node.name;
         el.value = node.id;
@@ -222,37 +261,38 @@ function loadData() {
 }
 
 
-async function select(time) {
+async function select(elem, step) {
     let toolbar = document.querySelector('.toolbar');
-    let after = document.getElementById('after');
-    let before = document.getElementById('before');
 
-    if (time === "after") {
-        toolbar.classList.add('hidden');
-        after.classList.add('selected')
-        before.classList.remove('selected')
-
-        let data = await prim()
-        let afterGraph = new Graph(graph.getNodes(), data.map(([from, to]) => ({from, to, weight: 2})))
-        afterGraph.setContext(document.getElementById('draw').getContext('2d'))
-        afterGraph.render("#ff0000")
-    } else if (time === "before") {
+    if (elem.id === "before") {
         toolbar.classList.remove('hidden');
-        after.classList.remove('selected')
-        before.classList.add('selected')
+    } else
+        toolbar.classList.add('hidden');
 
-        graph.render()
+    for (let elem of document.getElementsByClassName('graph-state-button'))
+        elem.classList.remove('selected');
+    elem.classList.add('selected');
+
+    if (step) {
+        const graph = new Graph(GRAPH.getNodes(), GRAPH.getEdges());
+        console.log(graph.getNodes(), graph.getEdges());
+        (await prim(step)).map(edge => graph.addEdge(edge.from, edge.to, edge.weight, "#b83434"));
+        const canvas = document.getElementById('draw');
+        graph.setContext(canvas.getContext("2d"))
+        graph.render();
+    } else {
+        GRAPH.render()
     }
 }
 
-async function prim(){
+async function prim(edges) {
     let response = await fetch("http://localhost:5000/prim", {
         method: "POST",
         "headers": {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            tree: graph.getEdges().map(item => ({
+            tree: edges.map(item => ({
                 node_reference: item.from,
                 node_adjacent: item.to,
                 cost: item.weight
@@ -260,5 +300,26 @@ async function prim(){
         })
     })
 
-    return (await response.json()).response;
+    return (await response.json()).response.map(([from, to, weight]) => ({from, to, weight: weight.weight}));
+}
+
+async function printSteps() {
+    let steps = await GRAPH.getSteps()
+
+    for (let i = 0; i < steps.length; i++) {
+        let step = steps[i];
+
+        let button = document.createElement('button');
+        button.className = 'graph-state-button';
+        button.onclick = () => {
+            select(button, step);
+        };
+        button.innerHTML = i + 1;
+
+        document.getElementById('graphState').appendChild(button);
+    }
+}
+
+async function loadStep(step) {
+
 }
