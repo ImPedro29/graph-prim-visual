@@ -145,7 +145,7 @@ class Graph {
             to,
             weight,
             color
-        })
+        });
     }
 
     async getSteps() {
@@ -241,6 +241,7 @@ function add() {
         GRAPH.addEdge(from, to, weight);
     }
 
+    printSteps()
     GRAPH.render();
     closeModal();
 }
@@ -304,8 +305,10 @@ async function prim(edges) {
 }
 
 async function printSteps() {
-    let steps = await GRAPH.getSteps()
+    const steps = await GRAPH.getSteps()
+    const stepsElem = document.getElementById('steps');
 
+    stepsElem.innerHTML = '';
     for (let i = 0; i < steps.length; i++) {
         let step = steps[i];
 
@@ -316,10 +319,6 @@ async function printSteps() {
         };
         button.innerHTML = i + 1;
 
-        document.getElementById('graphState').appendChild(button);
+        stepsElem.appendChild(button);
     }
-}
-
-async function loadStep(step) {
-
 }
