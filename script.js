@@ -19,13 +19,13 @@ let NODES = [
     },
     {
         x: 1050,
-        y: 800,
+        y: 700,
         id: 3,
         name: "Vodka",
     },
     {
         x: 1690,
-        y: 600,
+        y: 20,
         id: 4,
         name: "Bananinha",
     }
@@ -92,13 +92,16 @@ class Graph {
         this.ctx.closePath();
     }
 
-    renderNode({x, y}) {
+    renderNode({x, y, name}) {
         this.ctx.beginPath();
         let {ctx} = this;
         let img = document.createElement('img')
         img.src = "images/pole.png"
         img.onload = () => {
             ctx.drawImage(img, x - 50, y - 10, 100, 100)
+            ctx.font = "24px Arial, sans-serif";
+            ctx.fillStyle = "#333";
+            ctx.fillText(name, x-(name.length*5.8), y+120);
             this.ctx.closePath();
         }
     }
