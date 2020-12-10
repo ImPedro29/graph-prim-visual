@@ -12,19 +12,19 @@ let NODES = [
         name: "Corote",
     },
     {
-        x: 650,
+        x: 950,
         y: 300,
         id: 2,
         name: "Chicote",
     },
     {
-        x: 450,
+        x: 1050,
         y: 800,
         id: 3,
         name: "Vodka",
     },
     {
-        x: 190,
+        x: 1690,
         y: 600,
         id: 4,
         name: "Bananinha",
