@@ -3,31 +3,31 @@ let NODES = [
         x: 100,
         y: 200,
         id: 0,
-        name: "Piru",
+        name: "Tikira",
     },
     {
         x: 150,
         y: 400,
         id: 1,
-        name: "Pussy",
+        name: "Corote",
     },
     {
         x: 650,
         y: 300,
         id: 2,
-        name: "Banana",
+        name: "Chicote",
     },
     {
         x: 450,
         y: 800,
         id: 3,
-        name: "Jaca",
+        name: "Vodka",
     },
     {
         x: 190,
         y: 600,
         id: 4,
-        name: "Jumento",
+        name: "Bananinha",
     }
 ];
 
@@ -82,11 +82,13 @@ class Graph {
 
         this.ctx.beginPath();
         let {ctx} = this;
-        ctx.moveTo(fromNode.x, fromNode.y);
-        ctx.lineTo(toNode.x, toNode.y);
-        ctx.lineWidth = weight;
+        ctx.bezierCurveTo(fromNode.x, fromNode.y, (fromNode.x+toNode.x)/2, ((fromNode.y+toNode.y)/2)+60, toNode.x, toNode.y);
+        ctx.lineWidth = 3;
         ctx.strokeStyle = color || colorReceived;
         ctx.stroke();
+        ctx.font = "24px Arial, sans-serif";
+        ctx.fillStyle = "#d72525";
+        ctx.fillText(weight, (fromNode.x+toNode.x)/2+28, ((fromNode.y+toNode.y)/2)+60);
         this.ctx.closePath();
     }
 
